@@ -301,28 +301,28 @@ svg#canvas {
       border: 2px solid #000;
     }
     &.one {
-      background-image: url('https://assets.codepen.io/626120/sticker1.svg');
+      background-image: url('/images/onion-print.svg');
     }
     &.two {
-      background-image: url('https://assets.codepen.io/626120/sticker2.svg');
+      background-image: url('/images/roller-skates-print.svg');
     }
     &.three {
-      background-image: url('https://assets.codepen.io/626120/prismatic-sticker%402x.png');
+      background-image: url('/images/prismatic-print.png');
     }
     &.four {
-      background-image: url('https://assets.codepen.io/626120/glitter-sticker_1.png');
+      background-image: url('/images/glitter-print.png');
     }
     &.five {
-      background-image: url('https://assets.codepen.io/626120/kraft-paper-print.png');
+      background-image: url('/images/recycled-print.png');
     }
     &.six {
-      background-image: url('https://assets.codepen.io/626120/brushed-print_1.png');
+      background-image: url('/images/brushed-print.png');
     }
     &.seven {
-      background-image: url('https://assets.codepen.io/626120/mirror-print.png');
+      background-image: url('/images/mirror-print.png');
     }
     &.eight {
-      background-image: url('https://assets.codepen.io/626120/clear-print.png');
+      background-image: url('/images/clear-print.png');
     }
   }
 }
