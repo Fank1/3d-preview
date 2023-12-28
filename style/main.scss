@@ -1,0 +1,633 @@
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root {
+  --posX: 0;
+  --posY: 0;
+  --accentColor: #cfb400;
+  --shadow: 0 0 15px rgba(0, 0, 30, 0.12);
+  --hueshift: 0;
+}
+
+body {
+  background-color: #eee;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  -webkit-appearance: none;
+}
+
+body {
+  overflow: scroll !important; /* Show scrollbars */
+}
+
+.wrapper {
+  overflow: scroll !important; /* Show scrollbars */
+}
+
+body.has-clear {
+  background-image: url('https://assets.codepen.io/626120/stickerapp-tile.jpg');
+  background-size: 60%;
+}
+
+body.add-motive {
+  .overlay {
+    display: block;
+  }
+  .add-sticker-modal {
+    display: block;
+  }
+}
+
+.has-shadow {
+  filter: drop-shadow(var(--shadow));
+}
+svg#canvas {
+  outline: 1px solid transparent;
+  width: 100vw;
+  height: 100vh;
+  stroke: none;
+  overflow: hidden;
+}
+
+.wrapper {
+  -webkit-transform-style: preserve-3d !important;
+  -webkit-appearance: none;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  transform-origin: 50% 50%;
+  appearance: none;
+}
+
+.wrapper.inspectMode {
+  transform: scale(1.2) translate3d(0, 0, 0) perspective(600px)
+    rotateX(calc(var(--posY) * -100deg)) rotateY(calc(var(--posX) * -100deg));
+}
+
+@media (prefers-reduced-motion) {
+  /* styles to apply if a user's device settings are set to reduced motion */
+  .wrapper.inspectMode {
+    transform: scale(1.2) translate3d(0, 0, 0) perspective(600px)
+      rotateX(calc(var(--posY) * -100deg)) rotateY(calc(var(--posX) * -100deg));
+  }
+}
+
+//-------------LAMINATES AND METALLIC REFLECTION --------
+
+.wrapper.has-gloss {
+  #laminate {
+    display: block;
+    background: inherit !important;
+    opacity: 0.09;
+    mix-blend-mode: hard-light;
+    filter: url(#displacementFilter);
+  }
+}
+.wrapper.has-matte {
+  #print {
+    filter: contrast(85%);
+  }
+  #laminate {
+    display: none;
+  }
+}
+
+.wrapper.has-cracked {
+  #laminate {
+    opacity: 0.09;
+    filter: url(#displacementFilter);
+  }
+}
+
+.wrapper.has-metallic {
+  #metallic {
+    opacity: 0.3;
+    filter: none;
+    mix-blend-mode: hard-light;
+  }
+}
+
+.wrapper.has-metallic.has-gloss {
+  #metallic {
+    filter: url(#displacementFilter);
+  }
+}
+
+// ------- THE DIFFERENT LAYERS---------
+
+.layer {
+  pointer-events: none;
+  &.is-off {
+    display: none !important;
+  }
+}
+
+.layer#print {
+  mix-blend-mode: multiply;
+}
+
+#baseplate {
+  cursor: pointer;
+  pointer-events: auto !important;
+  fill: #fefefe;
+  stroke: #ddd;
+  stroke-width: 0.5;
+}
+
+.layer#laminate {
+  stroke: none;
+  will-change: filter, transform;
+  content-visibility: hidden;
+}
+
+.layer#prismatic {
+  mix-blend-mode: hard-light;
+}
+
+.layer#white-layer {
+  mix-blend-mode: lighten;
+}
+
+.layer#glitter {
+  mix-blend-mode: plus-lighter;
+  filter: hue-rotate(var(--hueshift));
+}
+
+.layer#cracked {
+  mix-blend-mode: screen;
+}
+
+.layer#metallic {
+  mix-blend-mode: hard-light;
+}
+
+//------------ MATERIALS -----------------
+
+.wrapper {
+  &.has-vinyl {
+    //
+  }
+  &.has-cracked {
+    #cracked {
+      opacity: 1;
+    }
+  }
+  &.has-holographic {
+    #baseplate {
+      fill: #aaa;
+    }
+    #holographic {
+      opacity: 1;
+      filter: url(#displacementFilter);
+      mix-blend-mode: lighten;
+    }
+  }
+  &.has-prismatic {
+    #pattern-scaler {
+      display: flex;
+    }
+    #prismatic {
+      opacity: 0.7;
+      mix-blend-mode: hard-light;
+    }
+  }
+  &.has-glitter {
+    #baseplate {
+      fill: #aaa;
+    }
+    #glitter {
+      opacity: 1;
+    }
+    &.has-white-layer {
+      #combined-white-mask image {
+        opacity: 1;
+      }
+    }
+  }
+  &.has-recycled {
+    #baseplate {
+      fill: url('#recycled-pattern');
+    }
+    #print {
+      filter: contrast(1.2);
+      mix-blend-mode: multiply;
+      opacity: 0.9;
+    }
+    #laminate {
+      opacity: 0.01;
+    }
+  }
+  &.has-pixie {
+    #baseplate {
+      fill: #aaa;
+    }
+    #pixie {
+      opacity: 1;
+      mix-blend-mode: overlay;
+    }
+    #holographic {
+      opacity: 0.5;
+      mix-blend-mode: color;
+    }
+    &.has-white-layer {
+      #combined-white-mask image {
+        opacity: 1;
+      }
+    }
+  }
+  &.has-brushed {
+    #baseplate {
+      fill: #bbb;
+    }
+    #brushed {
+      opacity: 0.8;
+      mix-blend-mode: hard-light;
+    }
+    #metallic {
+      //
+    }
+  }
+  &.has-mirror {
+    //
+  }
+}
+
+//-------- DEBUG ELEMENTS / SIDEBAR STUFF ---------
+
+.sticker-selector {
+  position: fixed;
+  z-index: 1;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  .modal-button {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    order: 99;
+    line-height: 0.3;
+    font-size: 24px;
+    font-weight: 300;
+    margin: 0.5rem;
+    height: 52px;
+    width: 52px;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  .sticker {
+    cursor: pointer;
+    width: 54px;
+    height: 54px;
+    background-color: #fff;
+    border-radius: 8px;
+    margin: 0.5rem;
+    border: 2px solid #ddd;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+    &.is-active {
+      border: 2px solid #000;
+    }
+    &.one {
+      background-image: url('https://assets.codepen.io/626120/sticker1.svg');
+    }
+    &.two {
+      background-image: url('https://assets.codepen.io/626120/sticker2.svg');
+    }
+    &.three {
+      background-image: url('https://assets.codepen.io/626120/prismatic-sticker%402x.png');
+    }
+    &.four {
+      background-image: url('https://assets.codepen.io/626120/glitter-sticker_1.png');
+    }
+    &.five {
+      background-image: url('https://assets.codepen.io/626120/kraft-paper-print.png');
+    }
+    &.six {
+      background-image: url('https://assets.codepen.io/626120/brushed-print_1.png');
+    }
+    &.seven {
+      background-image: url('https://assets.codepen.io/626120/mirror-print.png');
+    }
+    &.eight {
+      background-image: url('https://assets.codepen.io/626120/clear-print.png');
+    }
+  }
+}
+
+.hamburger {
+  display: none;
+  z-index: 999;
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ccc;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url('https://assets.codepen.io/626120/hamburger.svg');
+}
+
+.sidebar {
+  z-index: 998;
+  transition: right 300ms;
+  background-color: #fff;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  position: fixed;
+  width: 300px;
+  border-left: 1px solid #ddd;
+  height: 100vh;
+  overflow: scroll;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  .label {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 1rem;
+    &:before {
+      border-radius: 2px;
+      margin-right: 8px;
+      content: '';
+      display: block;
+      border: 1px solid transparent;
+      width: 12px;
+      height: 12px;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-color: #000;
+      background-size: 50%;
+      background-image: url('https://assets.codepen.io/626120/tick.svg');
+    }
+    &.is-off {
+      &:before {
+        background-image: none;
+        background-color: #eee;
+        border: 1px solid #ccc;
+      }
+    }
+  }
+  .option-group {
+    margin-bottom: 1.5rem;
+    &.is-off {
+      opacity: 0.5;
+    }
+    #pattern-scaler,
+    #laminate-scaler {
+      display: none;
+      font-size: 12px;
+      &.is-shown {
+        display: flex;
+      }
+      align-items: center;
+      input {
+        margin-right: 1rem;
+      }
+    }
+    .checkbox {
+      display: flex;
+      font-size: 14px;
+      align-items: center;
+      margin: 0.2rem 0;
+      &:before {
+        margin-right: 12px;
+        display: block;
+        content: '';
+        width: 18px;
+        height: 18px;
+        background-color: #eee;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      &.is-on {
+        &:before {
+          background-color: #000;
+          border-color: #000;
+          background-image: url('https://assets.codepen.io/626120/tick.svg');
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+      }
+    }
+    .option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin: 0.75rem 0;
+      font-size: 14px;
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+      &:before {
+        margin-right: 8px;
+        content: '';
+        width: 18px;
+        height: 18px;
+        border-radius: 100%;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        pointer-events: none;
+        transition: transform 200ms;
+      }
+      &.is-on {
+        &:before {
+          background-color: #000;
+          border-color: #000;
+        }
+        &:after {
+          content: '';
+          position: absolute;
+          width: 8px;
+          left: 6px;
+          height: 8px;
+          background-color: #fff;
+          border-radius: 100%;
+        }
+      }
+    }
+  }
+}
+
+//------ RESPONSIVE -----------
+
+@media (max-width: 640px) {
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  .hamburger {
+    display: block;
+  }
+  .sidebar {
+    right: -300px;
+  }
+  .sidebar.is-open {
+    right: 0;
+  }
+}
+
+.option-group.bottom {
+  margin: 1.5rem 0;
+}
+
+//disables disturbance filter on all materials
+
+.layer-turbulence-is-off .layer {
+  filter: none !important;
+}
+
+#cracked-mask svg path {
+  transition: opacity 300ms;
+}
+
+#clear-mask {
+  rect {
+    stroke: none;
+  }
+}
+
+#laminate-opacity,
+#metallic-opacity {
+  display: flex;
+  align-items: center;
+  &.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  input {
+    width: 80px;
+  }
+  p {
+    margin-left: 1rem;
+    font-size: 12px;
+  }
+  span {
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+  }
+  .reset {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+#metallic-opacity {
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.material span {
+  display: inline-block;
+  font-size: 11px;
+  background-color: #ddd;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-left: 1em;
+  padding: 3px 5px;
+  color: #555;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+#extra-recycled {
+  pointer-events: none;
+  filter: saturate(0) contrast(3);
+  opacity: 0.2;
+}
+
+.add-sticker-modal {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  z-index: 99;
+  position: fixed;
+  width: 480px;
+  height: auto;
+  background-color: #fff;
+  border-radius: 12px;
+  .bottom {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  button {
+    line-height: 0.4;
+    padding: 1rem;
+    height: 36px;
+    border: none;
+    font-weight: 700;
+    border-radius: 8px;
+    &.add {
+      margin-left: 0.7rem;
+      background-color: blue;
+      color: #fff;
+      &.disabled {
+        background-color: #aaa;
+      }
+    }
+  }
+  input,
+  textarea {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    margin: 0.5rem 0;
+    background-color: #eee;
+    padding: 0.5rem;
+    &.half {
+      width: 160px;
+      &:last-child {
+        margin-left: 1rem;
+      }
+    }
+  }
+  textarea {
+    font-size: 11px;
+    resize: vertical;
+  }
+  .heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+}
+
+.overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  opacity: 0.3;
+  z-index: 98;
+}
+
+.overlay,
+.add-sticker-modal {
+  display: none;
+}
+
+#combined-white-mask image {
+  opacity: 0;
+}

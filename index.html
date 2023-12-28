@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="se">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Preview</title>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <div class="add-sticker-modal">
+      <p class="heading">Lägg till motiv</p>
+      <input
+        placeholder="URL till motivet/trycket"
+        id="image-url"
+        type="text"
+      />
+      <input
+        placeholder="URL till motivets vita tryck (valfri)"
+        id="image-white-url"
+        type="text"
+      />
+      <input
+        placeholder="Path:ens bredd (i px)"
+        id="image-width"
+        type="number"
+        class="half"
+      />
+      <input
+        placeholder="Path:ens höjd (i px)"
+        id="image-height"
+        type="number"
+        class="half"
+      />
+      <textarea
+        id="baseplate-code"
+        rows="7"
+        placeholder="Path:ens d-attribut"
+      ></textarea>
+      <div class="bottom">
+        <button class="add disabled">Lägg till</button>
+        <button class="cancel">Avbryt</button>
+      </div>
+    </div>
+    <div class="sticker-selector">
+      <div class="sticker one is-active"></div>
+      <div class="sticker two"></div>
+      <div class="sticker three"></div>
+      <div class="sticker four"></div>
+      <div class="sticker five"></div>
+      <div class="sticker six"></div>
+      <div class="sticker seven"></div>
+      <div class="sticker eight"></div>
+      <div class="modal-button">+</div>
+    </div>
+    <div class="hamburger"></div>
+    <div class="sidebar">
+      <p class="label laminate">Laminat</p>
+      <div id="laminate-opacity">
+        <input
+          id="laminate-opacity-slider"
+          type="range"
+          min="0"
+          max="1"
+          value="0.09"
+          step="0.01"
+        />
+        <p><span>0.09</span> opacitet</p>
+        <p class="reset">Reset</p>
+      </div>
+      <div class="option-group">
+        <div class="option laminate gloss is-on">Glansig</div>
+        <div class="option laminate matte">Matt</div>
+        <div class="option laminate cracked">Cracked Ice</div>
+        <div id="laminate-scaler">
+          <input
+            id="laminate-scale"
+            type="range"
+            min="0.2"
+            max="1.2"
+            value="1"
+            step="0.01"
+          />
+          <p>Laminatskala</p>
+        </div>
+        <div class="checkbox laminateMaskToggle is-on">Basplattemask</div>
+        <div class="checkbox blendModeToggle is-on">Blend Mode (Multiply)</div>
+        <div class="checkbox turbulenceToggle is-on">Turbulens-filter</div>
+      </div>
+      <div class="option-group">
+        <p class="label print">Tryck (Motiv)</p>
+      </div>
+      <div class="option-group">
+        <p class="label white-layer is-off">Vitt tryck</p>
+      </div>
+      <div class="option-group">
+        <p class="label metallic-toggle is-off">Metallic-glans</p>
+      </div>
+      <div id="metallic-opacity" class="is-disabled">
+        <input
+          id="metallic-opacity-slider"
+          type="range"
+          min="0"
+          max="1"
+          value="0.3"
+          step="0.01"
+        />
+        <p><span>0.3</span> opacitet</p>
+        <p class="reset">Reset</p>
+      </div>
+      <p class="label material-toggle">Material</p>
+      <div class="option-group">
+        <div data-type="vinyl" class="option material vinyl is-on">Vinyl</div>
+        <div data-type="holographic" class="option metal material holographic">
+          Holografisk<span>Metal</span>
+        </div>
+        <div data-type="prismatic" class="option material prismatic">
+          Prismatisk<span>Metal</span>
+        </div>
+        <div data-type="glitter" class="option metal material glitter">
+          Glitter<span>Metal</span>
+        </div>
+        <div data-type="recycled" class="option material recycled">
+          Återvunnet
+        </div>
+        <div data-type="pixie" class="option metal material pixie">
+          Pixie Dust<span>Metal</span>
+        </div>
+        <div data-type="brushed" class="option metal material brushed">
+          Aluminium<span>Metal</span>
+        </div>
+        <div data-type="mirror" class="option metal material mirror">
+          Spegel<span>Metal</span>
+        </div>
+        <div data-type="clear" class="option material clear">Transparent</div>
+        <div class="checkbox materialTurbulenceToggle is-on">
+          Turbulens-filter
+        </div>
+        <div id="pattern-scaler">
+          <input
+            id="scale"
+            type="range"
+            min="0.2"
+            max="1.2"
+            value="1"
+            step="0.01"
+          />
+          <p>Mönsterskala</p>
+        </div>
+        <div class="option-group bottom">
+          <p class="label shadow">Skugga</p>
+        </div>
+      </div>
+    </div>
+    <div class="wrapper has-gloss has-vinyl has-shadow">
+      <svg
+        color-interpolation-filters="linearRGB"
+        id="canvas"
+        xmlns="http://www.w3.org/2000/svg"
+        version="1.1"
+        viewBox="0 0 1400 700"
+      >
+        <defs>
+          <filter id="blacken">
+            <feColorMatrix
+              type="matrix"
+              values=" 0  0  0  0  0 
+               0  0  0  0  0 
+               0  0  0  0  0 
+               0  0  0  1  0"
+            ></feColorMatrix>
+          </filter>
+          <mask id="combined-white-mask" maskContentUnits="userSpaceOnUse">
+            <use href="#baseplate" x="0" y="0" />
+            <image
+              class="fixed-size"
+              href="https://assets.codepen.io/626120/sticker1-white.png"
+              preserveAspectRatio="xMinYMid meet"
+              filter="url(#blacken)"
+            />
+          </mask>
+          <mask id="baseplatemask">
+            <svg>
+              <!-- this path content is set by JS – changing the path "d" attribute. Maybe there is a way to use the regular baseplate as mask instead of having copies -->
+              <path fill="#fff" />
+            </svg>
+          </mask>
+          <mask id="clear-mask" maskContentUnits="userSpaceOnUse">
+            <rect width="100%" height="100%" fill="#fff" />
+            <image
+              class="layer"
+              id="white-mask-layer"
+              preserveAspectRatio="xMinYMid meet"
+              href="https://assets.codepen.io/626120/sticker1-white.png"
+            />
+          </mask>
+          <mask id="clear-mask2" maskContentUnits="userSpaceOnUse">
+            <rect width="100%" height="100%" fill="#000" />
+            <image
+              class="layer"
+              id="white-mask-layer2"
+              preserveAspectRatio="xMinYMid meet"
+              href="https://assets.codepen.io/626120/sticker1-white.png"
+            />
+          </mask>
+          <mask id="pixie-mask">
+            <rect width="100%" height="100%" fill="url(#pixie-mask-pattern)" />
+          </mask>
+          <mask id="glitter-mask">
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#glitter-mask-pattern)"
+            />
+          </mask>
+          <mask id="cracked-mask">
+            <!-- cracked ice mask is loaded externally to not bloat dev code, source is https://codepen.io/fanki/pen/abXPMjo/84ef871a11b58b40b3b2cc8aefb550f0 -->
+          </mask>
+          <pattern
+            id="cracked-pattern"
+            patternUnits="userSpaceOnUse"
+            width="200"
+            height="200"
+            patternTransform="scale(1)"
+          >
+            <image
+              width="200"
+              height="200"
+              href="https://assets.codepen.io/626120/color-swirl.jpg"
+              mask="url(#cracked-mask)"
+              preserveAspectRatio="xMinYMid slice"
+            />
+          </pattern>
+          <pattern
+            id="cracked-mask-pattern"
+            patternUnits="userSpaceOnUse"
+            width="200"
+            height="200"
+            patternTransform="scale(1)"
+          >
+            <image
+              class="cracked-mask-layer"
+              width="200"
+              height="200"
+              href="https://assets.codepen.io/626120/cracked-mask1.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="cracked-mask-layer"
+              width="200"
+              height="200"
+              href="https://assets.codepen.io/626120/cracked-mask2.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="cracked-mask-layer"
+              width="200"
+              height="200"
+              href="https://assets.codepen.io/626120/cracked-mask3.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+          </pattern>
+          <pattern
+            id="pixie-mask-pattern"
+            patternUnits="userSpaceOnUse"
+            width="300"
+            height="300"
+            patternTransform="scale(1)"
+          >
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask1.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask2.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask3.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask4.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask5.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask6.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask7.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask8.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+            <image
+              class="pixie-mask-layer"
+              width="300"
+              height="300"
+              href="https://assets.codepen.io/626120/pixiedust-mask9.png"
+              preserveAspectRatio="xMinYMid meet"
+            />
+          </pattern>
+          <pattern
+            id="new-glitter-pattern"
+            patternUnits="userSpaceOnUse"
+            width="200"
+            height="200"
+            patternTransform="scale(0.5)"
+          >
+            <!-- this is loaded externally to not bloat dev code, source is https://codepen.io/fanki/pen/abXPMjo/84ef871a11b58b40b3b2cc8aefb550f0 -->
+          </pattern>
+          <pattern
+            id="pixie-pattern"
+            patternUnits="userSpaceOnUse"
+            width="400"
+            height="400"
+            patternTransform="scale(1)"
+          >
+            <image
+              class="pixie-layer"
+              width="400"
+              height="400"
+              href="https://assets.codepen.io/626120/colorful-noise.jpg"
+              preserveAspectRatio="xMinYMid meet"
+              mask="url(#pixie-mask)"
+            />
+          </pattern>
+          <pattern
+            id="recycled-pattern"
+            patternUnits="userSpaceOnUse"
+            width="1000"
+            height="1000"
+            patternTransform="scale(0.7)"
+          >
+            <image
+              class="recycled-layer"
+              width="1000"
+              height="1000"
+              href="https://assets.codepen.io/626120/recycled.jpg"
+              preserveAspectRatio="xMinYMid meet"
+            />
+          </pattern>
+          <pattern
+            id="prism-pattern"
+            patternUnits="userSpaceOnUse"
+            width="40"
+            height="40"
+            patternTransform="scale(1)"
+          >
+            <image
+              id="prism-img"
+              width="80"
+              height="80"
+              transform-origin="20 20"
+              href="https://assets.codepen.io/626120/prism-100x100.png"
+              transform="translate(-20 -20)"
+            ></image>
+            <image
+              id="prism-img-addition"
+              width="80"
+              height="80"
+              transform-origin="20 20"
+              preserveAspectRatio="xMidYMid slice"
+              href="https://assets.codepen.io/626120/prism-addition-100x100_1.png"
+              transform="translate(-20 -20)"
+            />
+          </pattern>
+          <pattern
+            id="brushed-pattern"
+            patternUnits="userSpaceOnUse"
+            width="300"
+            height="300"
+            patternTransform="scale(1)"
+          >
+            <image
+              width="300"
+              height="300"
+              preserveAspectRatio="xMidYMid meet"
+              href="https://assets.codepen.io/626120/brush-tile.jpg"
+            />
+          </pattern>
+        </defs>
+        <filter id="displacementFilter" filterUnits="userSpaceOnUse">
+          <feTurbulence
+            type="turbulence"
+            baseFrequency="0.05"
+            numOctaves="1"
+            result="turbulence"
+          />
+          <feDisplacementMap
+            in2="turbulence"
+            in="SourceGraphic"
+            scale="20"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+        <filter id="roughDisplacementFilter" filterUnits="userSpaceOnUse">
+          <feTurbulence
+            type="turbulence"
+            baseFrequency="0.02"
+            numOctaves="1"
+            result="turbulence"
+          />
+          <feDisplacementMap
+            in2="turbulence"
+            in="SourceGraphic"
+            scale="50"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+        <!-- baseplate is loaded by JS to not bloat dev code -->
+        <path class="layer" id="baseplate" clip-path="url(#clear-mask)" />
+        <rect
+          class="layer is-off material fixed-size is-masked"
+          id="prismatic"
+          fill="url(#prism-pattern)"
+        />
+        <image
+          class="layer is-off material is-masked"
+          id="holographic"
+          href="https://assets.codepen.io/626120/holographic-pattern.png"
+        />
+        <image
+          class="layer is-off material is-masked"
+          id="metallic"
+          href="https://assets.codepen.io/626120/escaltor-shine.jpg"
+          preserveAspectRatio="xMidYMid slice"
+        />
+        <image
+          class="layer is-off"
+          id="white-layer"
+          preserveAspectRatio="xMinYMid meet"
+        />
+        <rect
+          class="layer is-off material fixed-size is-masked"
+          id="brushed"
+          fill="url(#brushed-pattern)"
+        />
+        <image
+          class="layer"
+          id="print"
+          href="https://assets.codepen.io/626120/sticker1.svg"
+          preserveAspectRatio="xMinYMid meet"
+        />
+        <image
+          width="0"
+          height="0"
+          class="layer is-masked"
+          id="laminate"
+          href="https://assets.codepen.io/626120/escaltor-shine.jpg"
+          preserveAspectRatio="xMidYMid slice"
+          transform-origin="center"
+        />
+        <rect
+          class="layer is-off fixed-size is-masked"
+          id="cracked"
+          fill="url(#cracked-pattern)"
+        />
+        <rect
+          class="layer is-off material fixed-size"
+          mask="url(#combined-white-mask)"
+          id="pixie"
+          fill="url(#pixie-pattern)"
+        />
+        <rect
+          class="layer is-off material fixed-size is-masked"
+          id="extra-recycled"
+          fill="url(#recycled-pattern)"
+        />
+        <rect
+          class="layer material fixed-size is-off"
+          mask="url(#combined-white-mask)"
+          fill="url(#new-glitter-pattern)"
+          id="glitter"
+        />
+      </svg>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script type="module" src="/script.js"></script>
+  </body>
+</html>
