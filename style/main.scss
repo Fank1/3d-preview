@@ -22,14 +22,6 @@ body {
   -webkit-appearance: none;
 }
 
-body {
-  overflow: scroll !important; /* Show scrollbars */
-}
-
-.wrapper {
-  overflow: scroll !important; /* Show scrollbars */
-}
-
 body.has-clear {
   background-image: url('https://assets.codepen.io/626120/stickerapp-tile.jpg');
   background-size: 60%;
