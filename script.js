@@ -719,9 +719,9 @@ $(document).on('click', '.sticker', function () {
   $('.sticker').removeClass('is-active');
   $(this).addClass('is-active');
   let selectedIndex = $(this).index();
-  console.log(selectedIndex);
   currentSticker = stickers[selectedIndex];
   //change print
+  console.log(currentSticker.printUrl);
   $('#print').attr('href', currentSticker.printUrl);
   //change baseplate
   $('#baseplate').attr('d', currentSticker.baseplate);
