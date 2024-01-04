@@ -243,8 +243,8 @@ function addBaseplateMasking() {
 }
 
 function setFirstSticker() {
-  $('#print').attr('href', stickers[0].printUrl);
-  $('#white-layer').attr('href', stickers[0].printWhiteLayerUrl);
+  $('#print').attr('href', '/images/onion-print.svg');
+  $('#white-layer').attr('href', 'images/onion-white.png');
   $('#baseplate').attr('d', stickers[0].baseplate);
   $('#baseplatemask svg path').attr('d', stickers[0].baseplate);
   currentSticker = stickers[0];
