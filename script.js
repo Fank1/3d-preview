@@ -34,9 +34,9 @@ let currentLaminate;
 let hasMetallic = false;
 let currentSticker;
 const shinyReflectionImageUrl =
-  'https://assets.codepen.io/626120/escaltor-shine.jpg';
+  '/images/reflections/escaltor-shine.jpg';
 const matteReflectionImageUrl =
-  'https://assets.codepen.io/626120/escaltor-blur-20.jpg';
+  '/images/reflections/escaltor-matte.jpg';
 let screenCenterX = window.innerWidth / 2;
 let screenCenterY = window.innerHeight / 2;
 let printWidth = stickers[0].width;
@@ -75,7 +75,7 @@ const domGlitterPattern = document.querySelector('#new-glitter-pattern');
 let rainbowImage = document.createElement('image');
 rainbowImage.setAttribute(
   'href',
-  `https://assets.codepen.io/626120/square-holo.jpg`
+  `/images/effects/square-holo.jpg`
 );
 rainbowImage.setAttribute('width', `200`);
 rainbowImage.setAttribute('height', `200`);
@@ -806,7 +806,7 @@ $('.option.material').click(function () {
   $('#pattern-scaler').removeClass('is-shown');
   $('#laminate').attr(
     'href',
-    'https://assets.codepen.io/626120/escaltor-shine.jpg'
+    '/images/reflection/escaltor-shine.jpg'
   );
   // ----- just resets -------
   $('.wrapper').removeClass(
