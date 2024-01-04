@@ -19,11 +19,11 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  -webkit-appearance: none;
+  appearance: none;
 }
 
 body.has-clear {
-  background-image: url('https://assets.codepen.io/626120/stickerapp-tile.jpg');
+  background-image: url('/images/stickerapp-tile.jpg');
   background-size: 60%;
 }
 
@@ -48,8 +48,10 @@ svg#canvas {
 }
 
 .wrapper {
+  transform-style: preserve-3d !important;
   -webkit-transform-style: preserve-3d !important;
   -webkit-appearance: none;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
   transform-origin: 50% 50%;
@@ -161,9 +163,7 @@ svg#canvas {
 //------------ MATERIALS -----------------
 
 .wrapper {
-  &.has-vinyl {
-    //
-  }
+
   &.has-cracked {
     #cracked {
       opacity: 1;
@@ -240,12 +240,6 @@ svg#canvas {
       opacity: 0.8;
       mix-blend-mode: hard-light;
     }
-    #metallic {
-      //
-    }
-  }
-  &.has-mirror {
-    //
   }
 }
 
@@ -292,6 +286,7 @@ svg#canvas {
     &.is-active {
       border: 2px solid #000;
     }
+    
     &.one {
       background-image: url('/images/onion-print.svg');
     }
@@ -330,7 +325,7 @@ svg#canvas {
   border: 1px solid #ccc;
   background-repeat: no-repeat;
   background-position: center center;
-  background-image: url('https://assets.codepen.io/626120/hamburger.svg');
+  background-color: #ccc;
 }
 
 .sidebar {
