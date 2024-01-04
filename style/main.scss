@@ -220,7 +220,7 @@ svg#canvas {
     }
     #pixie {
       opacity: 1;
-      mix-blend-mode: overlay;
+      mix-blend-mode: hard-light;
     }
     #holographic {
       opacity: 0.5;
