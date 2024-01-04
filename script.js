@@ -556,7 +556,6 @@ function moveGlitter(type) {
   }
   let currentGlitterDots = glitterRowArray[glitterCurrentRow];
   if (type === 'reset') {
-    console.log('yup');
     allGlitterDotsObject[prevGlitterLayer[11]].setAttribute(
       'fill',
       `hsl(${720 * 1 + 720 * 1}, ${1 * 30 + 50}%,${90}%)`
@@ -721,7 +720,6 @@ $(document).on('click', '.sticker', function () {
   let selectedIndex = $(this).index();
   currentSticker = stickers[selectedIndex];
   //change print
-  console.log(currentSticker.printUrl);
   $('#print').attr('href', currentSticker.printUrl);
   //change baseplate
   $('#baseplate').attr('d', currentSticker.baseplate);
