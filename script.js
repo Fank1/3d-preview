@@ -806,7 +806,7 @@ $('.option.material').click(function () {
   $('#pattern-scaler').removeClass('is-shown');
   $('#laminate').attr(
     'href',
-    '/images/reflection/escaltor-shine.jpg'
+    '/images/reflections/escaltor-shine.jpg'
   );
   // ----- just resets -------
   $('.wrapper').removeClass(
